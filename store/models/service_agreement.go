@@ -15,10 +15,10 @@ import (
 
 // UnsignedServiceAgreement contains the information to sign a service agreement
 type UnsignedServiceAgreement struct {
-	Encumbrance             Encumbrance
-	ID                      common.Hash
-	RequestBody             string
-	ServiceAgreementRequest ServiceAgreementRequest
+	Encumbrance    Encumbrance
+	ID             common.Hash
+	RequestBody    string
+	JobSpecRequest JobSpecRequest
 }
 
 // ServiceAgreement connects job specifications with on-chain encumbrances.
@@ -63,10 +63,10 @@ func BuildServiceAgreement(us UnsignedServiceAgreement, signer Signer) (ServiceA
 	}
 
 	jobSpec := NewJob()
-	jobSpec.Initiators = us.ServiceAgreementRequest.Initiators
-	jobSpec.Tasks = us.ServiceAgreementRequest.Tasks
-	jobSpec.EndAt = us.ServiceAgreementRequest.EndAt
-	jobSpec.StartAt = us.ServiceAgreementRequest.StartAt
+	jobSpec.Initiators = us.JobSpecRequest.Initiators
+	jobSpec.Tasks = us.JobSpecRequest.Tasks
+	jobSpec.EndAt = us.JobSpecRequest.EndAt
+	jobSpec.StartAt = us.JobSpecRequest.StartAt
 
 	return ServiceAgreement{
 		ID:          us.ID.String(),
@@ -81,7 +81,7 @@ func BuildServiceAgreement(us UnsignedServiceAgreement, signer Signer) (ServiceA
 // NewUnsignedServiceAgreementFromRequest builds the information required to
 // sign a service agreement
 func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAgreement, error) {
-	var sar ServiceAgreementRequest
+	var sar JobSpecRequest
 
 	input, err := ioutil.ReadAll(reader)
 	if err != nil {
@@ -98,7 +98,7 @@ func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAg
 		return UnsignedServiceAgreement{}, err
 	}
 
-	normalized, err := utils.NormalizedJSON(sinput)
+	normalized, err := utils.NormalizedJSON(input)
 	if err != nil {
 		return UnsignedServiceAgreement{}, err
 	}
@@ -114,10 +114,10 @@ func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAg
 	}
 
 	us := UnsignedServiceAgreement{
-		ID:                      id,
-		Encumbrance:             encumbrance,
-		RequestBody:             normalized,
-		ServiceAgreementRequest: sar,
+		ID:             id,
+		Encumbrance:    encumbrance,
+		RequestBody:    normalized,
+		JobSpecRequest: sar,
 	}
 
 	return us, err
@@ -196,9 +196,4 @@ func encodeOracles(buffer *bytes.Buffer, oracles []EIP55Address) error {
 		}
 	}
 	return nil
-}
-
-// ServiceAgreementRequest represents a service agreement as requested over the wire.
-type ServiceAgreementRequest struct {
-	JobSpecRequest
 }

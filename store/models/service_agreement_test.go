@@ -64,7 +64,7 @@ func TestBuildServiceAgreement(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var sar models.ServiceAgreementRequest
+			var sar models.JobSpecRequest
 			assert.NoError(t, json.Unmarshal([]byte(test.input), &sar))
 
 			us, err := models.NewUnsignedServiceAgreementFromRequest(strings.NewReader(test.input))
