@@ -93,7 +93,12 @@ func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAg
 		return UnsignedServiceAgreement{}, err
 	}
 
-	normalized, err := utils.NormalizedJSON(input)
+	var encumbrance Encumbrance
+	if err := json.Unmarshal(input, &encumbrance); err != nil {
+		return UnsignedServiceAgreement{}, err
+	}
+
+	normalized, err := utils.NormalizedJSON(sinput)
 	if err != nil {
 		return UnsignedServiceAgreement{}, err
 	}
@@ -103,11 +108,6 @@ func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAg
 		return UnsignedServiceAgreement{}, err
 	}
 
-	encumbrance := Encumbrance{
-		Payment:    sar.Payment,
-		Expiration: sar.Expiration,
-		Oracles:    sar.Oracles,
-	}
 	id, err := generateServiceAgreementID(encumbrance, common.BytesToHash(requestDigest))
 	if err != nil {
 		return UnsignedServiceAgreement{}, err
@@ -156,6 +156,7 @@ func serviceAgreementIDInputBuffer(encumbrance Encumbrance, digest common.Hash) 
 type Encumbrance struct {
 	Payment    *assets.Link   `json:"payment"`
 	Expiration uint64         `json:"expiration"`
+	EndAt      Time           `json:"endAt"`
 	Oracles    []EIP55Address `json:"oracles"`
 }
 
@@ -199,8 +200,5 @@ func encodeOracles(buffer *bytes.Buffer, oracles []EIP55Address) error {
 
 // ServiceAgreementRequest represents a service agreement as requested over the wire.
 type ServiceAgreementRequest struct {
-	Payment    *assets.Link   `json:"payment"`
-	Expiration uint64         `json:"expiration"`
-	Oracles    []EIP55Address `json:"oracles"`
 	JobSpecRequest
 }
