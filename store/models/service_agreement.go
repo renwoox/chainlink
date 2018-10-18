@@ -2,9 +2,13 @@ package models
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"math/big"
 	"time"
 
@@ -175,6 +179,20 @@ func (e Encumbrance) ABI() ([]byte, error) {
 	}
 	expirationHash := common.BigToHash((*big.Int)(new(big.Int).SetUint64(e.Expiration)))
 	_, err = buffer.Write(expirationHash.Bytes())
+	if err != nil {
+		return []byte{}, err
+	}
+
+	// Get the absolute end date as a big-endian uint32 (unix seconds)
+	var endAt int64 = e.EndAt.Time.Unix()
+	if endAt > 0xffffffff { // Check that this fits in an int32. (It won't after 2038.)
+		return []byte{}, errors.New(
+			fmt.Sprintf("endAt date %s is too late! Protocol needs update!",
+				e.EndAt.Time))
+	}
+	endAtSerialised := make([]byte, 4)
+	binary.BigEndian.PutUint32(endAtSerialised, uint32(endAt&math.MaxUint32))
+	_, err = buffer.Write(endAtSerialised)
 	if err != nil {
 		return []byte{}, err
 	}

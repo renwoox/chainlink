@@ -36,6 +36,8 @@ type Config struct {
 	ClientNodeURL            string          `env:"CLIENT_NODE_URL" envDefault:"http://localhost:6688"`
 	DatabaseTimeout          Duration        `env:"DATABASE_TIMEOUT" envDefault:"500ms"`
 	Dev                      bool            `env:"CHAINLINK_DEV" envDefault:"false"`
+	MaximumServiceDuration   Duration        `env:"MAXIMUM_SERVICE_DURATION" envDefault:"1y"`
+	MinimumServiceDuration   Duration        `env:"MINIMUM_SERVICE_DURATION" envDefault:"1h"`
 	EthGasBumpThreshold      uint64          `env:"ETH_GAS_BUMP_THRESHOLD" envDefault:"12"`
 	EthGasBumpWei            big.Int         `env:"ETH_GAS_BUMP_WEI" envDefault:"5000000000"`
 	EthGasPriceDefault       big.Int         `env:"ETH_GAS_PRICE_DEFAULT" envDefault:"20000000000"`
