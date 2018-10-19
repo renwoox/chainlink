@@ -11,7 +11,7 @@ import {
   recoverPersonalSignature,
   stranger,
   toHex
-} from './support/helpers'
+} from './support/helpers';
 import { assertBigNum } from './support/matchers'
 
 contract('Coordinator', () => {
@@ -24,10 +24,27 @@ contract('Coordinator', () => {
 
   it('has a limited public interface', () => {
     checkPublicABI(artifacts.require(sourcePath), [
+      'getPackedArguments',
       'getId',
       'initiateServiceAgreement',
       'serviceAgreements'
     ])
+  })
+
+  const args = [
+    1,
+    2,
+    // XXX endAt goes here...
+    ['0x70AEc4B9CFFA7b55C0711b82DD719049d615E21d', '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07'],
+    '0x85820c5ec619a1f517ee6cfeff545ec0ca1a90206e1a38c47f016d4137e801dd'
+  ]
+
+  describe('show arguments', () => {
+    // This is mostly useful as a sanity check
+    it('returns the following value, given these arguments', async() => {
+      let result = await coordinator.getPackedArguments.call(...args)
+      console.log('result:', result)
+    })
   })
 
   describe('#getId', () => {
@@ -35,10 +52,11 @@ contract('Coordinator', () => {
       let result = await coordinator.getId.call(
         1,
         2,
+        
         ['0x70AEc4B9CFFA7b55C0711b82DD719049d615E21d', '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07'],
         '0x85820c5ec619a1f517ee6cfeff545ec0ca1a90206e1a38c47f016d4137e801dd'
       )
-      assert.equal(result, '0x2249a9e0a0463724551b2980299a16406da6f4e80d911628ee77445be4e04e7c')
+        assert.equal(result, '0x051cbe4da44aaf77559a072f94fccf6992e138802295c263e08457e21af87bc5')
     })
   })
 

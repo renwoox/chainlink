@@ -16,10 +16,13 @@
   "dependencies": {
     "@ensdomains/ens": "^0.1.1",
     "change-case": "^3.0.2",
+    "eslint": "^5.7.0",
     "formik": "^1.0.3",
+    "jshint": "^2.9.6",
     "link_token": "^1.0.1",
     "openzeppelin-solidity": "^1.12.0",
-    "solidity-cborutils": "github:smartcontractkit/solidity-cborutils"
+    "solidity-cborutils": "github:smartcontractkit/solidity-cborutils",
+    "tern": "^0.22.3"
   },
   "devDependencies": {
     "@material-ui/core": "^3.1.0",
@@ -75,7 +78,7 @@
     "solc": "^0.4.24",
     "solium": "^1.1.8",
     "solium-plugin-zeppelin": "^0.0.2",
-    "standard": "^11.0.1",
+    "standard": "^12.0.1",
     "truffle": "^4.1.14",
     "truffle-contract": "^3.0.6",
     "truffle-flattener": "^1.2.8",

@@ -30,13 +30,17 @@ import (
 // Config holds parameters used by the application which can be overridden
 // by setting environment variables.
 type Config struct {
-	AllowOrigins             string          `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000,http://localhost:6688"`
-	BridgeResponseURL        models.WebURL   `env:"BRIDGE_RESPONSE_URL" envDefault:""`
-	ChainID                  uint64          `env:"ETH_CHAIN_ID" envDefault:"0"`
-	ClientNodeURL            string          `env:"CLIENT_NODE_URL" envDefault:"http://localhost:6688"`
-	DatabaseTimeout          Duration        `env:"DATABASE_TIMEOUT" envDefault:"500ms"`
-	Dev                      bool            `env:"CHAINLINK_DEV" envDefault:"false"`
-	MaximumServiceDuration   Duration        `env:"MAXIMUM_SERVICE_DURATION" envDefault:"1y"`
+	AllowOrigins      string        `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000,http://localhost:6688"`
+	BridgeResponseURL models.WebURL `env:"BRIDGE_RESPONSE_URL" envDefault:""`
+	ChainID           uint64        `env:"ETH_CHAIN_ID" envDefault:"0"`
+	ClientNodeURL     string        `env:"CLIENT_NODE_URL" envDefault:"http://localhost:6688"`
+	DatabaseTimeout   Duration      `env:"DATABASE_TIMEOUT" envDefault:"500ms"`
+	Dev               bool          `env:"CHAINLINK_DEV" envDefault:"false"`
+	// How long from now that a service agreement is allowed to run. Note
+	// that THIS IS HARD-CODED to one year in ../solidity/contracts/Coordinator.sol
+	MaximumServiceDuration Duration `env:"MAXIMUM_SERVICE_DURATION" envDefault:"1y"`
+	// Shortest duration from now that a service is allowed to run. XXX: Note
+	// that THIS IS HARD-CODED to one day in ../solidity/contracts/Coordinator.sol
 	MinimumServiceDuration   Duration        `env:"MINIMUM_SERVICE_DURATION" envDefault:"1h"`
 	EthGasBumpThreshold      uint64          `env:"ETH_GAS_BUMP_THRESHOLD" envDefault:"12"`
 	EthGasBumpWei            big.Int         `env:"ETH_GAS_BUMP_WEI" envDefault:"5000000000"`
