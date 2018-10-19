@@ -23,7 +23,7 @@ contract Coordinator {
     address[] _oracles,
     bytes32 _requestDigest
   )
-    public pure returns (bytes32[])
+    public pure returns (bytes)
   {
     return abi.encodePacked(_payment, _expiration, _endAt, _oracles, _requestDigest);
   }
