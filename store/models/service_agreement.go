@@ -2,9 +2,13 @@ package models
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"math/big"
 	"time"
 
@@ -15,10 +19,10 @@ import (
 
 // UnsignedServiceAgreement contains the information to sign a service agreement
 type UnsignedServiceAgreement struct {
-	Encumbrance             Encumbrance
-	ID                      common.Hash
-	RequestBody             string
-	ServiceAgreementRequest ServiceAgreementRequest
+	Encumbrance    Encumbrance
+	ID             common.Hash
+	RequestBody    string
+	JobSpecRequest JobSpecRequest
 }
 
 // ServiceAgreement connects job specifications with on-chain encumbrances.
@@ -63,10 +67,10 @@ func BuildServiceAgreement(us UnsignedServiceAgreement, signer Signer) (ServiceA
 	}
 
 	jobSpec := NewJob()
-	jobSpec.Initiators = us.ServiceAgreementRequest.Initiators
-	jobSpec.Tasks = us.ServiceAgreementRequest.Tasks
-	jobSpec.EndAt = us.ServiceAgreementRequest.EndAt
-	jobSpec.StartAt = us.ServiceAgreementRequest.StartAt
+	jobSpec.Initiators = us.JobSpecRequest.Initiators
+	jobSpec.Tasks = us.JobSpecRequest.Tasks
+	jobSpec.EndAt = us.JobSpecRequest.EndAt
+	jobSpec.StartAt = us.JobSpecRequest.StartAt
 
 	return ServiceAgreement{
 		ID:          us.ID.String(),
@@ -81,7 +85,7 @@ func BuildServiceAgreement(us UnsignedServiceAgreement, signer Signer) (ServiceA
 // NewUnsignedServiceAgreementFromRequest builds the information required to
 // sign a service agreement
 func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAgreement, error) {
-	var sar ServiceAgreementRequest
+	var sar JobSpecRequest
 
 	input, err := ioutil.ReadAll(reader)
 	if err != nil {
@@ -90,6 +94,11 @@ func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAg
 
 	err = json.Unmarshal(input, &sar)
 	if err != nil {
+		return UnsignedServiceAgreement{}, err
+	}
+
+	var encumbrance Encumbrance
+	if err := json.Unmarshal(input, &encumbrance); err != nil {
 		return UnsignedServiceAgreement{}, err
 	}
 
@@ -103,21 +112,16 @@ func NewUnsignedServiceAgreementFromRequest(reader io.Reader) (UnsignedServiceAg
 		return UnsignedServiceAgreement{}, err
 	}
 
-	encumbrance := Encumbrance{
-		Payment:    sar.Payment,
-		Expiration: sar.Expiration,
-		Oracles:    sar.Oracles,
-	}
 	id, err := generateServiceAgreementID(encumbrance, common.BytesToHash(requestDigest))
 	if err != nil {
 		return UnsignedServiceAgreement{}, err
 	}
 
 	us := UnsignedServiceAgreement{
-		ID:                      id,
-		Encumbrance:             encumbrance,
-		RequestBody:             normalized,
-		ServiceAgreementRequest: sar,
+		ID:             id,
+		Encumbrance:    encumbrance,
+		RequestBody:    normalized,
+		JobSpecRequest: sar,
 	}
 
 	return us, err
@@ -156,6 +160,7 @@ func serviceAgreementIDInputBuffer(encumbrance Encumbrance, digest common.Hash) 
 type Encumbrance struct {
 	Payment    *assets.Link   `json:"payment"`
 	Expiration uint64         `json:"expiration"`
+	EndAt      Time           `json:"endAt"`
 	Oracles    []EIP55Address `json:"oracles"`
 }
 
@@ -178,6 +183,20 @@ func (e Encumbrance) ABI() ([]byte, error) {
 		return []byte{}, err
 	}
 
+	// Get the absolute end date as a big-endian uint32 (unix seconds)
+	var endAt int64 = e.EndAt.Time.Unix()
+	if endAt > 0xffffffff { // Check that this fits in an int32. (It won't after 2038.)
+		return []byte{}, errors.New(
+			fmt.Sprintf("endAt date %s is too late! Protocol needs update!",
+				e.EndAt.Time))
+	}
+	endAtSerialised := make([]byte, 4)
+	binary.BigEndian.PutUint32(endAtSerialised, uint32(endAt&math.MaxUint32))
+	_, err = buffer.Write(endAtSerialised)
+	if err != nil {
+		return []byte{}, err
+	}
+
 	err = encodeOracles(&buffer, e.Oracles)
 	if err != nil {
 		return []byte{}, err
@@ -195,12 +214,4 @@ func encodeOracles(buffer *bytes.Buffer, oracles []EIP55Address) error {
 		}
 	}
 	return nil
-}
-
-// ServiceAgreementRequest represents a service agreement as requested over the wire.
-type ServiceAgreementRequest struct {
-	Payment    *assets.Link   `json:"payment"`
-	Expiration uint64         `json:"expiration"`
-	Oracles    []EIP55Address `json:"oracles"`
-	JobSpecRequest
 }
