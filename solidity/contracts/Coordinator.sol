@@ -9,6 +9,7 @@ contract Coordinator {
   struct ServiceAgreement {
     uint256 payment;
     uint256 expiration;
+    uint256 endAt;
     address[] oracles;
     bytes32 requestDigest;
   }
@@ -87,30 +88,47 @@ contract Coordinator {
       _data);
   }
 
+  // This is mostly useful as a sanity check in the #getId test, because the
+  // hash value there is illegible by design.
+  function getPackedArguments(
+    uint256 _payment,
+    uint256 _expiration,
+    uint256 _endAt,
+    address[] _oracles,
+    bytes32 _requestDigest
+                              )
+    public pure returns (bytes)
+  {
+    return abi.encodePacked(_payment, _expiration, _endAt, _oracles, _requestDigest);
+  }
+
   function getId(
     uint256 _payment,
     uint256 _expiration,
+    uint256 _endAt,
     address[] _oracles,
     bytes32 _requestDigest
   )
     public pure returns (bytes32)
   {
-    return keccak256(abi.encodePacked(_payment, _expiration, _oracles, _requestDigest));
+    return keccak256(getPackedArguments(_payment, _expiration, _endAt, _oracles, _requestDigest));
   }
 
   function initiateServiceAgreement(
     uint256 _payment,
     uint256 _expiration,
+    uint256 _endAt,
     address[] _oracles,
     uint8[] _vs,
     bytes32[] _rs,
     bytes32[] _ss,
     bytes32 _requestDigest
-  ) public
-  {
+  ) public {
     require(_oracles.length == _vs.length && _vs.length == _rs.length && _rs.length == _ss.length, "Must pass in as many signatures as oracles");
 
-    bytes32 serviceAgreementID = getId(_payment, _expiration, _oracles, _requestDigest);
+    bytes32 serviceAgreementID = getId(_payment, _expiration, _endAt, _oracles, _requestDigest);
+
+    require(_endAt > block.timestamp, "End of ServiceAgreement must be in the future");
 
     for (uint i = 0; i < _oracles.length; i++) {
       address signer = getOracleAddressFromSASignature(serviceAgreementID, _vs[i], _rs[i], _ss[i]);
@@ -120,6 +138,7 @@ contract Coordinator {
     serviceAgreements[serviceAgreementID] = ServiceAgreement(
       _payment,
       _expiration,
+      _endAt,
       _oracles,
       _requestDigest
     );
@@ -142,7 +161,8 @@ contract Coordinator {
     _;
   }
 
-  bytes4 constant private permittedFunc = bytes4(keccak256("executeServiceAgreement(address,uint256,uint256,bytes32,address,bytes4,bytes32,bytes)"));
+  bytes4 constant private permittedFunc =
+  bytes4(keccak256("executeServiceAgreement(address,uint256,uint256,bytes32,address,bytes4,bytes32,bytes)"));
 
   modifier permittedFunctionsForLINK() {
     bytes4[1] memory funcSelector;
