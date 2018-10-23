@@ -163,7 +163,7 @@ contract Coordinator {
   }
 
   bytes4 constant private permittedFunc =
-  bytes4(keccak256("executeServiceAgreement(address,uint256,uint256,bytes32,address,bytes4,bytes32,bytes)"));
+    bytes4(keccak256("executeServiceAgreement(address,uint256,uint256,bytes32,address,bytes4,bytes32,bytes)"));
 
   modifier permittedFunctionsForLINK() {
     bytes4[1] memory funcSelector;
