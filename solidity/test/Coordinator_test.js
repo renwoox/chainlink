@@ -154,11 +154,8 @@ contract('Coordinator', () => {
     })
 
     context('when called through the LINK token with enough payment', () => {
-      console.log('arguments', toHex(sAID), to, fHash, '1', '')
       const payload = executeServiceAgreementBytes(toHex(sAID), to, fHash, '1', '')
-      console.log('payload = ', payload)
       beforeEach(async () => {
-        // XXX: Something is not coming through, here. Which one?
         tx = await link.transferAndCall(coordinator.address, payment, payload, {
           from: consumer
         })
