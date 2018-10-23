@@ -126,9 +126,10 @@ contract Coordinator {
   ) public {
     require(_oracles.length == _vs.length && _vs.length == _rs.length && _rs.length == _ss.length, "Must pass in as many signatures as oracles");
 
+    require(_endAt > block.timestamp, "End of ServiceAgreement must be in the future");
+
     bytes32 serviceAgreementID = getId(_payment, _expiration, _endAt, _oracles, _requestDigest);
 
-    require(_endAt > block.timestamp, "End of ServiceAgreement must be in the future");
 
     for (uint i = 0; i < _oracles.length; i++) {
       address signer = getOracleAddressFromSASignature(serviceAgreementID, _vs[i], _rs[i], _ss[i]);
