@@ -18,6 +18,9 @@ const styles = theme => ({
   title: {
     marginTop: theme.spacing.unit * 5,
     marginBottom: theme.spacing.unit * 5
+  },
+  index: {
+    paddingBottom: theme.spacing.unit * 5
   }
 })
 
@@ -57,7 +60,7 @@ export class Index extends Component {
 
   render () {
     return (
-      <div>
+      <div className={this.props.classes.index}>
         <Grid container alignItems='center' >
           <Grid item xs={9}>
             <Typography variant='display2' color='inherit' className={this.props.classes.title}>
