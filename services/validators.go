@@ -148,8 +148,6 @@ func ValidateServiceAgreement(sa models.ServiceAgreement, store *store.Store) er
 	}
 
 	untilEndAt := time.Until(sa.Encumbrance.EndAt.Time)
-	fmt.Print("MaximumServiceDuration ", config.MaximumServiceDuration,
-		" untilEndAt", untilEndAt, "\n")
 
 	if untilEndAt > config.MaximumServiceDuration.Duration {
 		fe.Add(fmt.Sprintf("Service agreement encumbrance error: endAt value of %s is too far in the future. Furthest allowed date is %s",
