@@ -123,8 +123,8 @@ contract Coordinator {
     bytes32[] _rs,
     bytes32[] _ss,
     bytes32 _requestDigest
-  ) public {
-    require(_oracles.length == _vs.length && _vs.length == _rs.length && _rs.length == _ss.length, "Must pass in as many signatures as oracles");
+  ) public {                    
+    require(_oracles.length == _vs.length && _vs.length == _rs.length && _rs.length == _ss.length, "Must pass in as many signatures as oracles"); /* solium-disable-line max-len */
 
     require(_endAt > block.timestamp, "End of ServiceAgreement must be in the future");
 
@@ -163,7 +163,7 @@ contract Coordinator {
   }
 
   bytes4 constant private permittedFunc =
-    bytes4(keccak256("executeServiceAgreement(address,uint256,uint256,bytes32,address,bytes4,bytes32,bytes)"));
+    bytes4(keccak256("executeServiceAgreement(address,uint256,uint256,bytes32,address,bytes4,bytes32,bytes)")); /* solium-disable-line indentation */
 
   modifier permittedFunctionsForLINK() {
     bytes4[1] memory funcSelector;
