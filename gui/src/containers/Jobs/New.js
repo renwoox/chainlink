@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import PaddedCard from 'components/PaddedCard'
 import Form from 'components/Jobs/Form'
-import { submitJobSpec } from 'actions'
+import { createJobSpec } from 'actions'
 import matchRouteAndMapDispatchToProps from 'utils/matchRouteAndMapDispatchToProps'
 
 const styles = theme => ({
@@ -23,24 +23,14 @@ const styles = theme => ({
   }
 })
 
-const TabContainer = (props, classes) => {
-  return (
-    <Typography component='div' className={classes.padding}>
-      {props.children}
-    </Typography>
-  )
-}
+const SuccessNotification = ({data}) => (
+  <React.Fragment>
+    Successfully created job <Link to={`/job_specs/${data.id}`}>{data.id}</Link>
+  </React.Fragment>
+)
 
-TabContainer.propTypes = {
-  children: PropTypes.node.isRequired
-}
-
-const successNotification = ({name}) => (<React.Fragment>
-  Successfully created <Link to={`/bridges/${name}`}>{name}</Link>
-</React.Fragment>)
-
-const errorNotification = ({name}) => (
-  <React.Fragment>Error creating {name}</React.Fragment>
+const ErrorNotification = () => (
+  <React.Fragment>Error creating job</React.Fragment>
 )
 
 const New = props => (
@@ -61,9 +51,9 @@ const New = props => (
         <PaddedCard>
           <Form
             actionText='Create Bridge'
-            onSubmit={props.submitJobSpec}
-            onSuccess={successNotification}
-            onError={errorNotification}
+            onSubmit={props.createJobSpec}
+            onSuccess={SuccessNotification}
+            onError={ErrorNotification}
             {...(props.location && props.location.state)}
           />
         </PaddedCard>
@@ -78,7 +68,7 @@ New.propTypes = {
 
 export const ConnectedNew = connect(
   null,
-  matchRouteAndMapDispatchToProps({submitJobSpec})
+  matchRouteAndMapDispatchToProps({createJobSpec})
 )(New)
 
 export default withStyles(styles)(ConnectedNew)
