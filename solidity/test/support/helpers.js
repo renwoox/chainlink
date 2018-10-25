@@ -56,7 +56,6 @@ export const consumer = accounts[3]
 accounts = undefined;  //
 
 (() => {
-  // This doesn't run in tests which don't have a `beforeEach`.
   before(async function () {
     utils = Utils(web3.currentProvider)
     wallet = Wallet(PRIVATE_KEY, utils)
