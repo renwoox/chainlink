@@ -123,7 +123,7 @@ contract Coordinator {
     bytes32[] _rs,
     bytes32[] _ss,
     bytes32 _requestDigest
-  ) public {                    
+  ) public {
     require(_oracles.length == _vs.length && _vs.length == _rs.length && _rs.length == _ss.length, "Must pass in as many signatures as oracles"); /* solium-disable-line max-len */
 
     require(_endAt > block.timestamp, "End of ServiceAgreement must be in the future");
