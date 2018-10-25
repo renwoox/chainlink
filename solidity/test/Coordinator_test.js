@@ -88,7 +88,7 @@ contract('Coordinator', () => {
       endAt : newHash(sixMonthsFromNow.toString()),
       oracles : [oracle],
       requestDigest : newHash(
-        '0x9ebed6ae16d275059bf4de0e01482b0eca7ffc0ffcc1918db61e17ac0f7dedc8')
+        '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef')
     }
     const serviceAgreementID = calculateSAID(unsignedDefaultServiceAgreement)
     const oracleSignature = personalSign(oracle, serviceAgreementID)
@@ -135,7 +135,7 @@ contract('Coordinator', () => {
     const fHash = functionSelector('requestedBytes32(bytes32,bytes32)')
     const to = '0x80e29acb842498fe6591f020bd82766dce619d43'
     const payment = 1000000000000000000
-    const requestDigest = newHash('0x9ebed6ae16d275059bf4de0e01482b0eca7ffc0ffcc1918db61e17ac0f7dedc8')
+    const requestDigest = newHash('0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef')
     const oracle = newAddress(oracleNode)
     const unsignedArgs = { payment: newHash(payment.toString()),
                            expiration: newHash('300'),
