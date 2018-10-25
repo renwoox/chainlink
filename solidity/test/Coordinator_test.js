@@ -148,7 +148,6 @@ contract('Coordinator', () => {
     const signedArgs = Object.assign(unsignedArgs, { oracleSignature })
 
     beforeEach(async () => {
-      if (signedArgs === undefined) { throw Error('what???') }
       await initiateServiceAgreement(coordinator, signedArgs)
       await link.transfer(consumer, toWei(1000))
     })
