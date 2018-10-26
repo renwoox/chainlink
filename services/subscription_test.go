@@ -215,7 +215,7 @@ func TestInitiatorSubscriptionLogEvent_ValidateRunLog(t *testing.T) {
 		{"runlog proper hex jobid", services.RunLogTopic, cltest.StringToHash(job.ID), noRequesters, unpermittedAddr, true},
 		{"runlog incorrect encoded jobid", services.RunLogTopic, common.HexToHash("0x4a1eb0e8df314cb894024a38991cff0f00000000000000000000000000000000"), noRequesters, unpermittedAddr, true},
 		{"runlog correct requester", services.RunLogTopic, cltest.StringToHash(job.ID), requesterList, permittedAddr, true},
-		{"runlog incorrect requester", services.RunLogTopic, cltest.StringToHash(job.ID), requesterList, unpermittedAddr, false},
+		{"runlog incorrect requester", services.RunLogTopic, cltest.StringToHash(job.ID), requesterList, unpermittedAddr, true},
 	}
 
 	for _, test := range tests {
